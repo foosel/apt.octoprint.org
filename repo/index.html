@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8"/>
+    <title>OctoPrint APT repository</title>
+  </head>
+  <body>
+    <h1>OctoPrint APT repository</h1>
+
+    <p>Debian packages related to <a href="https://octoprint.org" target="_blank">OctoPrint</a>.</p>
+    <p>Signing key: <a href="./key.asc"><code>4E6D68F7B4237DE5</code></a></p>
+
+    <h2>Raspberry Pi</h2>
+
+    <code>
+        curl -s --compressed "https://apt.octoprint.org/key.asc" | gpg --dearmor | sudo tee /etc/apt/trusted.gpg.d/octoprint.gpg > /dev/null<br>
+        sudo curl -s --compressed -o /etc/apt/sources.list.d/octoprint.rpi.list "https://apt.octoprint.org/octoprint.rpi.list"<br>
+        sudo apt update<br>
+    </code>
+  </body>
+</html>
