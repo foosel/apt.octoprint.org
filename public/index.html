@@ -14,8 +14,8 @@
     <h2>Raspberry Pi</h2>
 
     <code>
-        curl -s --compressed "https://apt.octoprint.org/key.asc" | gpg --dearmor | sudo tee /etc/apt/trusted.gpg.d/octoprint.gpg > /dev/null<br>
-        sudo curl -s --compressed -o /etc/apt/sources.list.d/octoprint.rpi.list "https://apt.octoprint.org/octoprint.rpi.list"<br>
+        curl -s --compressed "https://apt.octoprint.org/octoprint.gpg.key" | gpg --dearmor | sudo tee /etc/apt/trusted.gpg.d/octoprint.gpg > /dev/null<br>
+        sudo curl -s --compressed -o /etc/apt/sources.list.d/octoprint.list "https://apt.octoprint.org/octoprint-bullseye-rpi.list"<br>
         sudo apt update<br>
     </code>
   </body>
