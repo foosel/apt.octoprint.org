@@ -65,11 +65,6 @@ jobs:
           COMPONENTS: rpi
           ARCHS: binary-armhf
 
-      - name: Generate Directory Listings
-        uses: jayanta525/github-pages-directory-listing@v2.0.0
-        with:
-          FOLDER: repo
-
       - name: Upload pages artifact
         uses: actions/upload-pages-artifact@v1
         with:
