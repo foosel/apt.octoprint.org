@@ -34,7 +34,14 @@ jobs:
       - name: Generate repository files
         run: |
           # prepare directory structure
-          mkdir -p repo/dists/{bullseye}/{rpi}/{binary-armhf}
+          for dist in $DISTS; do
+            for component in $COMPONENTS; do
+              for arch in $ARCHS; do
+                mkdir -p repo/dists/$dist/$component/$arch
+              done
+            done
+          done
+
           mkdir -p cache
           tree repo
 
@@ -42,11 +49,15 @@ jobs:
           apt-ftparchive generate apt-ftparchive.conf
           
           # generate signed & unsigned Release files
-          for dist in "bullseye"; do
+          for dist in $DISTS; do
             apt-ftparchive -c $dist.conf release repo/dists/$dist > repo/dists/$dist/Release
             gpg --default-key "apt@octoprint.org" -abs -o - repo/dists/$dist/Release > repo/dists/$dist/Release.gpg
             gpg --default-key "apt@octoprint.org" --clearsign -o - repo/dists/$dist/Release > repo/dists/$dist/InRelease
           done
+        env:
+          DISTS: bullseye
+          COMPONENTS: rpi
+          ARCHS: binary-armhf
 
       - name: Generate Directory Listings
         uses: jayanta525/github-pages-directory-listing@v2.0.0
