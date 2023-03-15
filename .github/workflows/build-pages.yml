@@ -1,6 +1,9 @@
 name: "Build pages"
 
 on:
+  push:
+    branches:
+      - main
   workflow_dispatch:
 
 jobs:
@@ -20,7 +23,7 @@ jobs:
       
       - name: Install apt-utils
         run: |
-          apt -y install apt-utils
+          sudo apt-get -y install apt-utils
 
       - name: Cache apt-ftparchive db
         uses: actions/cache@v3
