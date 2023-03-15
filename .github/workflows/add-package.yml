@@ -1,0 +1,48 @@
+name: "Add package to repository"
+
+on:
+  repository_dispatch:
+    types: [add-package]
+
+jobs:
+  add-package:
+    name: "Add package"
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+        with:
+          path: checkout
+      
+      - name: Fetch package
+        id: fetch
+        run: |
+          URL="${{ github.event.client_payload.url }}"
+          DIST="${{ github.event.client_payload.dist }}"
+          COMPONENT="${{ github.event.client_payload.component }}"
+
+          echo "URL: $URL"
+          echo "DIST: $DIST"
+          echo "COMPONENT: $COMPONENT"
+
+          # download package
+          curl -LOJ $URL
+
+          # figure out file and package name
+          deb=$(ls *.deb | head -n 1)
+          name=$(echo $deb | cut -d_ -f1)
+
+          # copy package to repo
+          target=checkout/repo/pool/$DIST/$COMPONENT/$name
+          mkdir -p $target && mv $deb $target
+
+          echo "DEB=$deb" >> $GITHUB_ENV
+          echo "DIST=$DIST" >> $GITHUB_ENV
+          echo "COMPONENT=$COMPONENT" >> $GITHUB_ENV
+
+      - name: Commit
+        uses: EndBug/add-and-commit@v9
+        with:
+          cwd: checkout
+          message: "Add package ${{ env.DEB }} for ${{ env.DIST }}/${{ env.COMPONENT }}"
