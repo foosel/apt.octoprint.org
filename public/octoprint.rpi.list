@@ -1,0 +1,1 @@
+deb [signed-by=/etc/apt/trusted.gpg.d/octoprint.gpg] https://apt.octoprint.org/debian bullseye rpi

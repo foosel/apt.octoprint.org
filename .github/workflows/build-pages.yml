@@ -18,57 +18,76 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout
+      - name: ⬇ Checkout
         uses: actions/checkout@v3
       
-      - name: Configure GPG key
+      - name: 🔑 Configure GPG key
         run: |
           echo -n "$GPG_SIGNING_KEY" | gpg --import
         env:
           GPG_SIGNING_KEY: ${{ secrets.GPG_SIGNING_KEY }}
       
-      - name: Install apt-utils
+      - name: 🏗 Install apt-utils
         run: |
           sudo apt-get -y install apt-utils
 
-      - name: Cache apt-ftparchive db
+      - name: 🏗 Set up Python 3.10
+        uses: actions/setup-python@v4
+        with:
+          python-version: "3.10"
+
+      - name: 📦 Cache apt-ftparchive db
         uses: actions/cache@v3
         with:
           path: cache
           key: ${[ runner.os }}-apt-ftparchive
 
-      - name: Generate repository files
+      - name: 🏗 Prepare folders
         run: |
+          mkdir -p cache
+          mkdir -p public/debian
+          cp -ar pool public/debian
+
+      - name: ✍ Generate repository files
+        env:
+          DISTS: bullseye
+          COMPONENTS: rpi
+          ARCHS: binary-armhf
+        run: |
+          repo="public/debian/dists"
+
           # prepare directory structure
           for dist in $DISTS; do
             for component in $COMPONENTS; do
               for arch in $ARCHS; do
-                mkdir -p repo/dists/$dist/$component/$arch
+                mkdir -p $repo/$dist/$component/$arch
               done
             done
           done
-
-          mkdir -p cache
-          tree repo
 
           # generate repo
           apt-ftparchive generate apt-ftparchive.conf
           
           # generate signed & unsigned Release files
           for dist in $DISTS; do
-            apt-ftparchive -c $dist.conf release repo/dists/$dist > repo/dists/$dist/Release
-            gpg --default-key "apt@octoprint.org" -abs -o - repo/dists/$dist/Release > repo/dists/$dist/Release.gpg
-            gpg --default-key "apt@octoprint.org" --clearsign -o - repo/dists/$dist/Release > repo/dists/$dist/InRelease
+            apt-ftparchive -c $dist.conf release $repo/$dist > $repo/$dist/Release
+            gpg --default-key "apt@octoprint.org" -abs -o - $repo/$dist/Release > $repo/$dist/Release.gpg
+            gpg --default-key "apt@octoprint.org" --clearsign -o - $repo/$dist/Release > $repo/$dist/InRelease
           done
-        env:
-          DISTS: bullseye
-          COMPONENTS: rpi
-          ARCHS: binary-armhf
 
-      - name: Upload pages artifact
+          tree public
+
+      - name: ✍ Generate Directory Listings
+        run: |
+          curl https://raw.githubusercontent.com/paperbenni/apindex/master/install.sh | bash
+
+          cd public
+          apindex debian/
+
+      - name: ⬆ Upload pages artifact
         uses: actions/upload-pages-artifact@v1
         with:
-          path: ./repo
+          path: ./public
   
   deploy:
     name: "Deploy"
