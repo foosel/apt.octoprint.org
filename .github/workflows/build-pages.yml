@@ -82,7 +82,7 @@ jobs:
           curl https://raw.githubusercontent.com/paperbenni/apindex/master/install.sh | bash
 
           cd public
-          apindex debian/
+          apindex debian
 
       - name: ⬆ Upload pages artifact
         uses: actions/upload-pages-artifact@v1
