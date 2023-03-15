@@ -36,6 +36,7 @@ jobs:
           # prepare directory structure
           mkdir -p repo/dists/{bullseye}/{rpi}/{binary-armhf}
           mkdir -p cache
+          tree repo
 
           # generate repo
           apt-ftparchive generate apt-ftparchive.conf
