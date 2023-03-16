@@ -34,7 +34,7 @@ jobs:
           name=$(echo $deb | cut -d_ -f1)
 
           # copy package to repo
-          target=checkout/repo/pool/$DIST/$COMPONENT/$name
+          target=checkout/pool/$DIST/$COMPONENT/$name
           mkdir -p $target && mv $deb $target
 
           echo "DEB=$deb" >> $GITHUB_ENV
