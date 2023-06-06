@@ -1,1 +1,1 @@
-deb https://apt.octoprint.org/debian bullseye rpi
+deb https://foosel.github.io/apt.octoprint.org/debian bullseye rpi
