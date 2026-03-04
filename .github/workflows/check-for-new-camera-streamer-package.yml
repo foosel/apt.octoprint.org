@@ -75,7 +75,9 @@ jobs:
             core.exportVariable("PACKAGE_URLS", packageUrls.join(" "));
 
       - name: ⬇ Checkout
-        uses: actions/checkout@v3
+        uses: actions/checkout@v6
+        with:
+          persist-credentials: false
 
       - name: 🤔 Check if package is already in repo
         id: check-package-exists
