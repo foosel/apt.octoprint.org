@@ -1,0 +1,34 @@
+version: "3"
+
+vars:
+  CAMERA_STREAMER: ayufan/camera-streamer
+
+tasks:
+  update-camera-streamer:
+    cmds:
+      - |
+        TAG="{{.TAG}}"
+        if [ "$TAG" == "latest" ]; then
+          TAG=$(curl -sL https://api.github.com/repos/{{.CAMERA_STREAMER}}/releases/latest | jq -r '.tag_name')
+        fi
+
+        URL="https://api.github.com/repos/{{.CAMERA_STREAMER}}/releases/tags/$TAG"
+        echo "Fetching release information for $TAG from $URL"
+
+        for url in $(curl -sL $URL | jq -r '.assets[].browser_download_url' | grep "camera-streamer-raspi.*\.deb"); 
+        do
+          echo $url
+          name=$(echo $url | cut -d/ -f9)
+          distro=$(echo $name | rev | cut -d. -f2 | rev | cut -d_ -f1)
+          arch=$(echo $name | rev | cut -d. -f2 | rev | cut -d_ -f2)
+
+          dir=pool/$distro/rpi/camera-streamer-raspi
+          if [ -d $dir ]; then
+            echo "Downloading $url to $name..."
+            pushd $dir
+              curl -LJ "$url" > "$name"
+            popd
+          fi
+        done
+    vars:
+      TAG: '{{.TAG|default "latest"}}'
